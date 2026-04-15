@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cyber Awareness Mission</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  height: 100vh;
+  background: url('https://images.unsplash.com/photo-1518770660439-4636190af475') no-repeat center/cover;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body::before {
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.75);
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  max-width: 800px;
+  padding: 30px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(0,255,200,0.3);
+}
+
+h1 { text-align:center; color:#00ffc8; }
+
+.progress { height:8px; background:#222; margin:10px 0; }
+.bar { height:100%; width:0%; background:#00ffc8; }
+
+.options button {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:none;
+  border-radius:8px;
+  background: rgba(0,0,0,0.6);
+  color:white;
+  cursor:pointer;
+}
+
+.options button:hover {
+  background:#00ffc8;
+  color:black;
+}
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+}
+
+.hidden { display:none; }
+
+button.start {
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  background:#00ffc8;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+#leaderboard {
+  margin-top:15px;
+  text-align:left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="startScreen">
+  <h1>Cyber Awareness Mission</h1>
+  <input id="username" placeholder="Enter your name" style="width:100%; padding:10px;">
+  <button class="start" onclick="startQuiz()">Start Mission 🚀</button>
+</div>
+
+<div id="quizScreen" class="hidden">
+  <div class="topbar">
+    <div id="lives">❤️❤️❤️</div>
+    <div id="timer">10</div>
+  </div>
+
+  <div class="progress">
+    <div class="bar" id="progressBar"></div>
+  </div>
+
+  <div id="question"></div>
+  <div class="options" id="options"></div>
+</div>
+
+<div id="resultScreen" class="hidden">
+  <h1 id="finalMsg"></h1>
+  <p id="scoreText"></p>
+
+  <h3>🏆 Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+
+  <button class="start" onclick="location.reload()">Restart</button>
+</div>
+
+</div>
+
+<script>
+const questionBank = [
+
+{
+q:"You receive an email that appears to be from your bank stating that your account will be blocked unless you immediately verify your details by clicking a link. The email looks official and includes logos. What is the safest action?",
+o:["Click the link and login immediately","Ignore the email or verify using the bank’s official website","Forward the email to friends"],
+a:1
+},
+
+{
+q:"While sitting in a café, you connect to a free public WiFi network and decide to check your bank account balance. What is the primary risk involved in this situation?",
+o:["No risk if the WiFi is fast","Your sensitive data can be intercepted by attackers","It will only affect internet speed"],
+a:1
+},
+
+{
+q:"You receive a message saying you have won a lottery and must share an OTP to claim the prize. The message urges you to act quickly. What should you do?",
+o:["Share the OTP to claim prize","Ignore and delete the message","Post the message online"],
+a:1
+},
+
+{
+q:"A website asks you to download a software update from an unknown link to improve performance. The site looks slightly suspicious. What is the best action?",
+o:["Download and install immediately","Verify the authenticity before downloading","Share the link with others"],
+a:1
+},
+
+{
+q:"Your friend messages you on social media asking for urgent financial help, but the language and tone seem unusual compared to how they normally communicate. What should you do?",
+o:["Send money immediately","Verify their identity through a call or another platform","Ignore completely"],
+a:1
+},
+
+{
+q:"You notice that a website URL is slightly misspelled (for example, 'gooogle.com' instead of 'google.com') but otherwise looks identical. What does this most likely indicate?",
+o:["It is a safe alternative website","It is likely a phishing attempt","It is a new official domain"],
+a:1
+},
+
+{
+q:"You are creating a password for your online banking account. Which of the following practices provides the highest level of security?",
+o:["Using your name and birthdate","Using a strong combination of letters, numbers, and symbols","Using a simple easy-to-remember word"],
+a:1
+},
+
+{
+q:"You receive a file attachment from an unknown sender with a message asking you to open it urgently. What is the safest approach?",
+o:["Open it immediately","Scan it or avoid opening if unsure","Forward it to others"],
+a:1
+},
+
+{
+q:"While browsing, a pop-up appears saying your device is infected and asks you to install antivirus software immediately. What should you do?",
+o:["Install the software from the pop-up","Close the pop-up and use trusted antivirus sources","Ignore and continue browsing risky sites"],
+a:1
+},
+
+{
+q:"A website shows 'HTTPS' in the address bar along with a lock symbol. What does this indicate?",
+o:["The site is completely safe and trustworthy","The connection is encrypted but caution is still needed","The site cannot be hacked"],
+a:1
+},
+
+{
+q:"You are using the same password across multiple websites for convenience. What is the major risk in this practice?",
+o:["No risk at all","If one account is compromised, all accounts can be affected","It improves security"],
+a:1
+},
+
+{
+q:"You receive frequent friend requests from unknown profiles with attractive photos. What should you do?",
+o:["Accept all requests","Ignore or verify before accepting","Send them personal details"],
+a:1
+},
+
+{
+q:"Your system shows frequent slowdowns and unusual pop-ups after installing a free application. What could be the reason?",
+o:["Normal behavior","Possible malware infection","Better performance"],
+a:1
+},
+
+{
+q:"You are asked to share personal information like Aadhaar or bank details on a website that you are not fully sure about. What should you do?",
+o:["Provide the details","Verify website authenticity before sharing","Share partial information"],
+a:1
+},
+
+{
+q:"You regularly update your software and operating system. How does this help in cybersecurity?",
+o:["It has no effect","It fixes vulnerabilities and improves security","It slows down the system only"],
+a:1
+}
+
+];
+
+// Shuffle
+let quiz = questionBank.sort(()=>Math.random()-0.5);
+
+let current=0, score=0, lives=3, time=10, timer;
+
+function startQuiz(){
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("quizScreen").classList.remove("hidden");
+  loadQuestion();
+}
+
+function loadQuestion(){
+  resetTimer();
+  document.getElementById("question").innerText =
+    `Q${current+1}. ${quiz[current].q}`;
+
+  let optDiv=document.getElementById("options");
+  optDiv.innerHTML="";
+
+  quiz[current].o.forEach((opt,i)=>{
+    let btn=document.createElement("button");
+    btn.innerText=opt;
+    btn.onclick=()=>selectAnswer(i);
+    optDiv.appendChild(btn);
+  });
+
+  updateProgress();
+}
+
+function selectAnswer(i){
+  clearInterval(timer);
+
+  if(i===quiz[current].a){
+    score++;
+  } else {
+    lives--;
+    updateLives();
+  }
+
+  nextStep();
+}
+
+function nextStep(){
+  if(lives<=0){
+    endGame("💀 Mission Failed");
+    return;
+  }
+
+  current++;
+  if(current<quiz.length){
+    loadQuestion();
+  } else {
+    endGame("🔐 Mission Successful");
+  }
+}
+
+function updateProgress(){
+  let percent=(current/quiz.length)*100;
+  document.getElementById("progressBar").style.width=percent+"%";
+}
+
+function updateLives(){
+  document.getElementById("lives").innerText="❤️".repeat(lives);
+}
+
+function resetTimer(){
+  clearInterval(timer);
+  time=10;
+  document.getElementById("timer").innerText=time;
+
+  timer=setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText=time;
+
+    if(time<=0){
+      clearInterval(timer);
+      lives--;
+      updateLives();
+      nextStep();
+    }
+  },1000);
+}
+
+function endGame(msg){
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+
+  document.getElementById("finalMsg").innerText=msg;
+  document.getElementById("scoreText").innerText =
+    `Score: ${score}/${quiz.length}`;
+
+  saveScore();
+  loadLeaderboard();
+}
+
+// Leaderboard
+function saveScore(){
+  let name=document.getElementById("username").value || "Anonymous";
+  let data=JSON.parse(localStorage.getItem("cyberScores"))||[];
+  data.push({name,score});
+  data.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("cyberScores",JSON.stringify(data.slice(0,5)));
+}
+
+function loadLeaderboard(){
+  let data=JSON.parse(localStorage.getItem("cyberScores"))||[];
+  let board=document.getElementById("leaderboard");
+  board.innerHTML="";
+  data.forEach(d=>{
+    let li=document.createElement("li");
+    li.innerText=`${d.name} - ${d.score}`;
+    board.appendChild(li);
+  });
+}
+</script>
+
+</body>
+</html>
